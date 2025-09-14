@@ -1,5 +1,4 @@
-# app.py
-from fastapi import FastAPI, UploadFile, File, HTTPException, Request
+from fastapi import FastAPI, UploadFile, File
 from fastapi.responses import JSONResponse
 from PyPDF2 import PdfReader, PdfWriter
 import io
@@ -7,14 +6,8 @@ import base64
 
 app = FastAPI()
 
-SECRET_TOKEN = "lacsurcsecur1423@@"
-
 @app.post("/split")
-async def split_pdf(request: Request, file: UploadFile = File(...)):
-    token = request.query_params.get("token")
-    if token != SECRET_TOKEN:
-        raise HTTPException(status_code=403, detail="Unauthorized")
-
+async def split_pdf(file: UploadFile = File(...)):
     content = await file.read()
     reader = PdfReader(io.BytesIO(content))
 
@@ -22,6 +15,7 @@ async def split_pdf(request: Request, file: UploadFile = File(...)):
     pages_per_bilan = 6
     total_pages = len(reader.pages)
 
+    # Calculer le nombre de bilans
     num_bilans = total_pages // pages_per_bilan
 
     for bilan_index in range(num_bilans):
