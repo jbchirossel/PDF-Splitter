@@ -1,10 +1,10 @@
 # PDF Splitter API
 
-Une API FastAPI pour découper automatiquement des PDFs à chaque occurrence de "édité le".
+Une API FastAPI pour découper automatiquement des PDFs en blocs de 6 pages.
 
 ## 🚀 Fonctionnalités
 
-- Découpe automatique des PDFs basée sur le texte "édité le"
+- Découpe automatique des PDFs par blocs de 6 pages
 - Retour des PDFs découpés en base64
 - API REST simple et rapide
 - Déploiement facile sur Render
@@ -43,7 +43,7 @@ L'API sera disponible sur `http://localhost:8000`
 
 ### Endpoint : POST `/split`
 
-Découpe un PDF en plusieurs parties basées sur le texte "édité le".
+Découpe un PDF en plusieurs parties de 6 pages chacune.
 
 **Paramètres :**
 - `file` : Fichier PDF à découper (multipart/form-data)
@@ -61,6 +61,9 @@ Découpe un PDF en plusieurs parties basées sur le texte "édité le".
   }
 ]
 ```
+
+**Exemple :**
+- PDF de 18 pages → 3 PDFs (bilan_1.pdf: pages 1-6, bilan_2.pdf: pages 7-12, bilan_3.pdf: pages 13-18)
 
 **Exemple avec curl :**
 ```bash
@@ -108,10 +111,11 @@ Votre API sera disponible sur une URL comme : `https://pdf-splitter.onrender.com
 
 ## 📝 Notes
 
-- L'API découpe le PDF à chaque occurrence de "édité le" (insensible à la casse)
+- L'API découpe le PDF en blocs de 6 pages automatiquement
 - Les fichiers découpés sont nommés `bilan_1.pdf`, `bilan_2.pdf`, etc.
 - Les PDFs sont retournés encodés en base64 pour faciliter le transfert
-- L'API gère automatiquement les cas où le texte de découpe n'est pas trouvé
+- Parfait pour des documents avec une structure fixe (ex: bilans de 6 pages)
+- Si le nombre de pages n'est pas un multiple de 6, les pages restantes ne sont pas incluses
 
 ## 🤝 Contribution
 

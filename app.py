@@ -14,39 +14,32 @@ async def split_pdf(file: UploadFile = File(...)):
     content = await file.read()
     reader = PdfReader(io.BytesIO(content))
 
-
     results = []
-    current_writer = PdfWriter()
-    part_index = 1
-
-
-    for i, page in enumerate(reader.pages):
-        text = page.extract_text() or ""
-
-
-        if "édité le" in text.lower() and len(current_writer.pages) > 0:
-            buffer = io.BytesIO()
-            current_writer.write(buffer)
-            encoded_pdf = base64.b64encode(buffer.getvalue()).decode('utf-8')
-            results.append({
-                "fileName": f"bilan_{part_index}.pdf",
-                "data": encoded_pdf
-            })
-            part_index += 1
-            current_writer = PdfWriter()
-
-
-        current_writer.add_page(page)
-
-
-    if len(current_writer.pages) > 0:
+    pages_per_bilan = 6
+    total_pages = len(reader.pages)
+    
+    # Calculer le nombre de bilans
+    num_bilans = total_pages // pages_per_bilan
+    
+    for bilan_index in range(num_bilans):
+        # Créer un nouveau writer pour chaque bilan
+        writer = PdfWriter()
+        
+        # Ajouter les 6 pages du bilan actuel
+        start_page = bilan_index * pages_per_bilan
+        end_page = start_page + pages_per_bilan
+        
+        for page_num in range(start_page, end_page):
+            writer.add_page(reader.pages[page_num])
+        
+        # Convertir en base64
         buffer = io.BytesIO()
-        current_writer.write(buffer)
+        writer.write(buffer)
         encoded_pdf = base64.b64encode(buffer.getvalue()).decode('utf-8')
+        
         results.append({
-            "fileName": f"bilan_{part_index}.pdf",
+            "fileName": f"bilan_{bilan_index + 1}.pdf",
             "data": encoded_pdf
         })
-
 
     return JSONResponse(content=results)
